@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<div class="breadcrumb">
+
+    <a href="/clients">
+        Clients
+    </a>
+
+    <span>/</span>
+
+    <a href="/clients/{{ client.id }}">
+        {{ client.name }}
+    </a>
+
+    <span>/</span>
+
+    <a href="/cases/{{ tax_case.id }}">
+        FY {{ tax_case.financial_year }}
+    </a>
+
+    <span>/</span>
+
+    <span>
+        Upload {{ report_name }}
+    </span>
+
+</div>
+
+
+<div class="page-heading">
+
+    <div>
+
+        <h2>
+            Upload Groww {{ report_name }}
+        </h2>
+
+        <p>
+            {{ client.name }}
+            ·
+            {{ client.pan }}
+            ·
+            FY {{ tax_case.financial_year }}
+        </p>
+
+    </div>
+
+</div>
+
+
+<div class="form-card">
+
+    {% if error %}
+
+    <div class="alert alert-error">
+        {{ error }}
+    </div>
+
+    {% endif %}
+
+
+    <form
+        method="post"
+        enctype="multipart/form-data"
+    >
+
+        <div class="upload-box">
+
+            <div class="upload-icon">
+                XLSX
+            </div>
+
+            <h3>
+                Select Groww {{ report_name }} report
+            </h3>
+
+            <p>
+                Only .xlsx files are currently supported.
+            </p>
+
+            <input
+                type="file"
+                name="file"
+                accept=".xlsx"
+                required
+            >
+
+        </div>
+
+
+        <div class="upload-checks">
+
+            <div>
+                ✓ File structure validation
+            </div>
+
+            <div>
+                ✓ Financial year validation
+            </div>
+
+            <div>
+                ✓ Duplicate detection
+            </div>
+
+            <div>
+                ✓ Groww client-code validation
+            </div>
+
+            <div>
+                ✓ Calculation reconciliation
+            </div>
+
+        </div>
+
+
+        <div class="form-actions">
+
+            <a
+                href="/cases/{{ tax_case.id }}"
+                class="button button-secondary"
+            >
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="button button-primary"
+            >
+                Upload & Process
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

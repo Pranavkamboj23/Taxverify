@@ -808,3 +808,189 @@ tbody tr:last-child td {
     }
 
 }
+
+.upload-box {
+    padding: 35px;
+
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+
+    text-align: center;
+
+    background: #fafbfc;
+}
+
+.upload-icon {
+    width: 55px;
+    height: 55px;
+
+    margin: 0 auto 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+
+    background: #ecfdf3;
+    color: #027a48;
+
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.upload-box h3 {
+    margin: 0 0 8px;
+}
+
+.upload-box p {
+    margin: 0 0 20px;
+
+    color: var(--muted);
+
+    font-size: 13px;
+}
+
+.upload-checks {
+    margin-top: 24px;
+
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+
+    color: var(--muted);
+
+    font-size: 12px;
+}
+
+.money-value {
+    font-size: 20px;
+}
+
+.report-info-panel {
+    margin-top: 22px;
+}
+
+.detail-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+}
+
+.detail-grid > div {
+    padding: 20px 22px;
+
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 7px;
+}
+
+.detail-grid span {
+    color: var(--muted);
+
+    font-size: 11px;
+}
+
+.detail-grid strong {
+    font-size: 13px;
+}
+
+.reconciliation-status {
+    display: inline-flex;
+
+    padding: 5px 8px;
+
+    border-radius: 20px;
+
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.reconciliation-match {
+    background: #ecfdf3;
+    color: #027a48;
+}
+
+.reconciliation-match_with_rounding {
+    background: #fff8e6;
+    color: #9a6700;
+}
+
+.reconciliation-calculated {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.reconciliation-mismatch {
+    background: #fff1f0;
+    color: #b42318;
+}
+
+.audit-formula {
+    padding: 25px;
+}
+
+.audit-formula > div {
+    margin-bottom: 8px;
+
+    color: var(--muted);
+
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+}
+
+.audit-formula strong {
+    display: block;
+
+    margin-bottom: 10px;
+
+    font-size: 16px;
+}
+
+.audit-formula p {
+    margin: 0;
+
+    font-family:
+        "SFMono-Regular",
+        Consolas,
+        monospace;
+
+    color: var(--muted);
+
+    font-size: 13px;
+}
+
+.status-in_progress {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.status-processed {
+    background: #ecfdf3;
+    color: #027a48;
+}
+
+.status-validation_failed {
+    background: #fff1f0;
+    color: #b42318;
+}
+
+@media (max-width: 800px) {
+
+    .upload-checks {
+        grid-template-columns: 1fr;
+    }
+
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+}

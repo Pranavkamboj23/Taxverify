@@ -114,32 +114,43 @@
 
         {% if uploaded_report %}
 
-            <div class="report-file">
+    <div class="report-file">
+        <span>
+            {{ uploaded_report.original_filename }}
+        </span>
+    </div>
 
-                <span>
-                    {{ uploaded_report.original_filename }}
-                </span>
+    <a
+        href="/reports/{{ uploaded_report.id }}"
+        class="button button-secondary full-width"
+    >
+        View Report
+    </a>
 
-            </div>
+{% else %}
 
-            <button
-                class="button button-secondary full-width"
-                type="button"
-                disabled
-            >
-                View Report
-            </button>
+    {% if report_type.key in ["FNO", "COMMODITY"] %}
 
-        {% else %}
+        <a
+            href="/cases/{{ tax_case.id }}/reports/{{ report_type.key }}/upload"
+            class="button button-primary full-width"
+        >
+            Upload {{ report_type.name }}
+        </a>
 
-            <a
-                href="#"
-                class="button button-primary full-width"
-            >
-                Upload {{ report_type.name }}
-            </a>
+    {% else %}
 
-        {% endif %}
+        <button
+            class="button button-secondary full-width"
+            type="button"
+            disabled
+        >
+            Coming Soon
+        </button>
+
+    {% endif %}
+
+{% endif %}
 
     </div>
 

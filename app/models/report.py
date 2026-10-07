@@ -1,7 +1,17 @@
-from datetime import datetime
+from datetime import date, datetime
 
-from sqlalchemy import DateTime, ForeignKey, String
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import (
+    Date,
+    DateTime,
+    ForeignKey,
+    String,
+    Text,
+)
+from sqlalchemy.orm import (
+    Mapped,
+    mapped_column,
+    relationship,
+)
 
 from app.database import Base
 
@@ -40,7 +50,7 @@ class BrokerReport(Base):
     )
 
     stored_filename: Mapped[str] = mapped_column(
-        String(255),
+        String(500),
         nullable=False,
     )
 
@@ -55,6 +65,27 @@ class BrokerReport(Base):
         nullable=True,
     )
 
+    broker_client_name: Mapped[str | None] = mapped_column(
+        String(200),
+        nullable=True,
+    )
+
+    broker_client_code: Mapped[str | None] = mapped_column(
+        String(100),
+        nullable=True,
+        index=True,
+    )
+
+    period_start: Mapped[date | None] = mapped_column(
+        Date,
+        nullable=True,
+    )
+
+    period_end: Mapped[date | None] = mapped_column(
+        Date,
+        nullable=True,
+    )
+
     processing_status: Mapped[str] = mapped_column(
         String(30),
         default="UPLOADED",
@@ -62,7 +93,7 @@ class BrokerReport(Base):
     )
 
     validation_message: Mapped[str | None] = mapped_column(
-        String(500),
+        Text,
         nullable=True,
     )
 
@@ -75,4 +106,16 @@ class BrokerReport(Base):
     tax_case = relationship(
         "TaxCase",
         back_populates="reports",
+    )
+
+    metrics = relationship(
+        "ReportMetric",
+        back_populates="report",
+        cascade="all, delete-orphan",
+    )
+
+    reconciliations = relationship(
+        "ReportReconciliation",
+        back_populates="report",
+        cascade="all, delete-orphan",
     )

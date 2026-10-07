@@ -1,0 +1,337 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<div class="breadcrumb">
+
+    <a href="/clients">
+        Clients
+    </a>
+
+    <span>/</span>
+
+    <a href="/clients/{{ client.id }}">
+        {{ client.name }}
+    </a>
+
+    <span>/</span>
+
+    <a href="/cases/{{ tax_case.id }}">
+        FY {{ tax_case.financial_year }}
+    </a>
+
+    <span>/</span>
+
+    <span>
+        Groww {{ report.report_type }}
+    </span>
+
+</div>
+
+
+<div class="page-heading">
+
+    <div>
+
+        <h2>
+            Groww {{ report.report_type }}
+        </h2>
+
+        <p>
+            {{ report.original_filename }}
+        </p>
+
+    </div>
+
+    <span
+        class="
+            status-badge
+            status-{{ report.processing_status|lower }}
+        "
+    >
+        {{ report.processing_status }}
+    </span>
+
+</div>
+
+
+<div class="stat-grid">
+
+    <div class="stat-card">
+
+        <div class="stat-label">
+            Realised P&amp;L
+        </div>
+
+        <div class="stat-value money-value">
+            ₹ {{ "{:,.2f}".format(
+                metrics["REALISED_PNL"].value
+            ) }}
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <div class="stat-label">
+            Charges
+        </div>
+
+        <div class="stat-value money-value">
+            ₹ {{ "{:,.2f}".format(
+                metrics["CHARGES"].value
+            ) }}
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <div class="stat-label">
+            Final Net P&amp;L
+        </div>
+
+        <div class="stat-value money-value">
+            ₹ {{ "{:,.2f}".format(
+                metrics["FINAL_NET_PNL"].value
+            ) }}
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <div class="stat-label">
+            Turnover
+        </div>
+
+        <div class="stat-value money-value">
+            ₹ {{ "{:,.2f}".format(
+                metrics["TURNOVER"].value
+            ) }}
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="panel report-info-panel">
+
+    <div class="panel-header">
+
+        <div>
+            <h3>
+                Report Information
+            </h3>
+
+            <p>
+                Broker metadata extracted from
+                the workbook.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="detail-grid">
+
+        <div>
+            <span>Broker</span>
+            <strong>Groww</strong>
+        </div>
+
+        <div>
+            <span>Report Type</span>
+            <strong>
+                {{ report.report_type }}
+            </strong>
+        </div>
+
+        <div>
+            <span>Groww Client</span>
+            <strong>
+                {{ report.broker_client_name }}
+            </strong>
+        </div>
+
+        <div>
+            <span>Groww Client Code</span>
+            <strong class="mono">
+                {{ report.broker_client_code }}
+            </strong>
+        </div>
+
+        <div>
+            <span>Period</span>
+            <strong>
+                {{ report.period_start }}
+                →
+                {{ report.period_end }}
+            </strong>
+        </div>
+
+        <div>
+            <span>Format</span>
+            <strong>
+                {{ report.format_version }}
+            </strong>
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="panel report-info-panel">
+
+    <div class="panel-header">
+
+        <div>
+            <h3>
+                Reconciliation
+            </h3>
+
+            <p>
+                Independent checks performed
+                by TaxVerify.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="table-wrapper">
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Check</th>
+                    <th>Reported</th>
+                    <th>Calculated</th>
+                    <th>Difference</th>
+                    <th>Status</th>
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+            {% for item in reconciliations %}
+
+                <tr>
+
+                    <td>
+                        {{ item.check_name }}
+                    </td>
+
+                    <td>
+                        {% if item.reported_value is not none %}
+                            ₹ {{ "{:,.2f}".format(
+                                item.reported_value
+                            ) }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        ₹ {{ "{:,.2f}".format(
+                            item.calculated_value
+                        ) }}
+                    </td>
+
+                    <td>
+                        {% if item.difference is not none %}
+                            ₹ {{ "{:,.2f}".format(
+                                item.difference
+                            ) }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+
+                    <td>
+
+                        <span
+                            class="
+                                reconciliation-status
+                                reconciliation-{{ item.status|lower }}
+                            "
+                        >
+                            {{ item.status }}
+                        </span>
+
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<div class="panel report-info-panel">
+
+    <div class="panel-header">
+
+        <div>
+            <h3>
+                Calculation Audit
+            </h3>
+
+            <p>
+                How TaxVerify obtained the
+                final figures.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="audit-formula">
+
+        <div>
+            Groww Rule
+        </div>
+
+        <strong>
+            Final Net P&amp;L
+            =
+            Realised P&amp;L
+            -
+            Charges
+        </strong>
+
+        <p>
+            {{ "{:,.2f}".format(
+                metrics["REALISED_PNL"].value
+            ) }}
+            -
+            {{ "{:,.2f}".format(
+                metrics["CHARGES"].value
+            ) }}
+            =
+            {{ "{:,.2f}".format(
+                metrics["FINAL_NET_PNL"].value
+            ) }}
+        </p>
+
+    </div>
+
+</div>
+
+{% endblock %}

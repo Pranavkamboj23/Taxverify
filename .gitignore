@@ -54,3 +54,4 @@ Thumbs.db
 build/
 dist/
 *.egg-info/
+local_test_files/

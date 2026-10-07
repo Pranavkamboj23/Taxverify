@@ -6,6 +6,7 @@ from app.config import settings
 from app.routes.cases import router as cases_router
 from app.routes.clients import router as clients_router
 from app.routes.dashboard import router as dashboard_router
+from app.routes.reports import router as reports_router
 
 
 app = FastAPI(
@@ -35,6 +36,9 @@ app.include_router(
     cases_router
 )
 
+app.include_router(
+    reports_router
+)
 
 @app.get("/")
 async def root():
@@ -53,3 +57,4 @@ async def health():
             "GROWW",
         ],
     }
+
