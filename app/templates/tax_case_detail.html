@@ -178,80 +178,235 @@
 
     </div>
 
+    <div class="summary-status-bar">
+
+        <div>
+            <strong>
+                {{ summary.processed_report_count }}
+            </strong>
+    
+            processed report(s)
+        </div>
+    
+        {% if summary.review_required_count > 0 %}
+    
+            <div class="summary-review-warning">
+    
+                {{ summary.review_required_count }}
+                report(s) require review
+    
+            </div>
+    
+        {% endif %}
+    
+    </div>
 
     <div class="summary-grid">
 
-        <div class="summary-item">
-            <span>
-                Intraday Turnover
-            </span>
-            <strong>
-                —
-            </strong>
-        </div>
-
 
         <div class="summary-item">
+    
             <span>
-                Intraday Net P&amp;L
+                1. Intraday Speculative Turnover
             </span>
-            <strong>
-                —
-            </strong>
+    
+            {% if summary.intraday_turnover.value is not none %}
+    
+                <strong>
+                    ₹ {{ "{:,.2f}".format(
+                        summary.intraday_turnover.value
+                    ) }}
+                </strong>
+    
+            {% else %}
+    
+                <strong class="summary-waiting">
+                    —
+                </strong>
+    
+            {% endif %}
+    
+            <small>
+                {{ summary.intraday_turnover.message }}
+            </small>
+    
         </div>
-
-
+    
+    
         <div class="summary-item">
+    
             <span>
-                Non-Speculative Turnover
+                2. Intraday Speculative Net P&amp;L
             </span>
-            <strong>
-                —
-            </strong>
+    
+            {% if summary.intraday_net_pnl.value is not none %}
+    
+                <strong>
+                    ₹ {{ "{:,.2f}".format(
+                        summary.intraday_net_pnl.value
+                    ) }}
+                </strong>
+    
+            {% else %}
+    
+                <strong class="summary-waiting">
+                    —
+                </strong>
+    
+            {% endif %}
+    
+            <small>
+                {{ summary.intraday_net_pnl.message }}
+            </small>
+    
         </div>
-
-
+    
+    
         <div class="summary-item">
+    
             <span>
-                Non-Speculative Net P&amp;L
+                3. Non-Speculative Turnover
             </span>
-            <strong>
-                —
-            </strong>
+    
+            {% if summary.non_spec_turnover.value is not none %}
+    
+                <strong>
+                    ₹ {{ "{:,.2f}".format(
+                        summary.non_spec_turnover.value
+                    ) }}
+                </strong>
+    
+            {% else %}
+    
+                <strong class="summary-waiting">
+                    —
+                </strong>
+    
+            {% endif %}
+    
+            <small>
+                {{ summary.non_spec_turnover.message }}
+            </small>
+    
         </div>
-
-
+    
+    
         <div class="summary-item">
+    
             <span>
-                Sale Consideration
+                4. Non-Speculative Net P&amp;L
             </span>
-            <strong>
-                —
-            </strong>
+    
+            {% if summary.non_spec_net_pnl.value is not none %}
+    
+                <strong>
+                    ₹ {{ "{:,.2f}".format(
+                        summary.non_spec_net_pnl.value
+                    ) }}
+                </strong>
+    
+            {% else %}
+    
+                <strong class="summary-waiting">
+                    —
+                </strong>
+    
+            {% endif %}
+    
+            <small>
+                {{ summary.non_spec_net_pnl.message }}
+            </small>
+    
         </div>
-
-
+    
+    
         <div class="summary-item">
+    
             <span>
-                Long-Term Capital Gain
+                5. Total Sale Consideration
             </span>
-            <strong>
-                —
-            </strong>
+    
+            {% if summary.sale_consideration.value is not none %}
+    
+                <strong>
+                    ₹ {{ "{:,.2f}".format(
+                        summary.sale_consideration.value
+                    ) }}
+                </strong>
+    
+            {% else %}
+    
+                <strong class="summary-waiting">
+                    —
+                </strong>
+    
+            {% endif %}
+    
+            <small>
+                {{ summary.sale_consideration.message }}
+            </small>
+    
         </div>
-
-
+    
+    
         <div class="summary-item">
+    
             <span>
-                Short-Term Capital Gain
+                6. Long-Term Capital Gain
             </span>
-            <strong>
-                —
-            </strong>
+    
+            {% if summary.ltcg.value is not none %}
+    
+                <strong>
+                    ₹ {{ "{:,.2f}".format(
+                        summary.ltcg.value
+                    ) }}
+                </strong>
+    
+            {% else %}
+    
+                <strong class="summary-waiting">
+                    —
+                </strong>
+    
+            {% endif %}
+    
+            <small>
+                {{ summary.ltcg.message }}
+            </small>
+    
         </div>
-
+    
+    
+        <div class="summary-item">
+    
+            <span>
+                7. Short-Term Capital Gain
+            </span>
+    
+            {% if summary.stcg.value is not none %}
+    
+                <strong>
+                    ₹ {{ "{:,.2f}".format(
+                        summary.stcg.value
+                    ) }}
+                </strong>
+    
+            {% else %}
+    
+                <strong class="summary-waiting">
+                    —
+                </strong>
+    
+            {% endif %}
+    
+            <small>
+                {{ summary.stcg.message }}
+            </small>
+    
+        </div>
+    
+    
     </div>
-
-</div>
 
 {% endblock %}

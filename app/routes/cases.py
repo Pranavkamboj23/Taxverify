@@ -11,6 +11,11 @@ from fastapi.responses import (
     HTMLResponse,
     RedirectResponse,
 )
+
+from app.aggregation.summary import (
+    build_groww_case_summary,
+)
+
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
@@ -235,6 +240,7 @@ async def tax_case_detail(
 
     report_map = {}
 
+
     for report in reports:
         if report.report_type not in report_map:
             report_map[report.report_type] = report
@@ -269,6 +275,10 @@ async def tax_case_detail(
             ),
         },
     ]
+    summary = build_groww_case_summary(
+    db,
+    tax_case.id,
+)
 
     return templates.TemplateResponse(
         request=request,
@@ -279,5 +289,6 @@ async def tax_case_detail(
             "client": tax_case.client,
             "report_map": report_map,
             "groww_report_types": groww_report_types,
+            "summary": summary,
         },
     )
