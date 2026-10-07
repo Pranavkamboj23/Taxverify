@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<div class="breadcrumb">
+
+    <a href="/clients">
+        Clients
+    </a>
+
+    <span>/</span>
+
+    <a href="/clients/{{ client.id }}">
+        {{ client.name }}
+    </a>
+
+    <span>/</span>
+
+    <span>
+        FY {{ tax_case.financial_year }}
+    </span>
+
+</div>
+
+
+<div class="page-heading">
+
+    <div>
+
+        <h2>
+            FY {{ tax_case.financial_year }}
+        </h2>
+
+        <p>
+            {{ client.name }}
+            ·
+            <span class="mono">
+                {{ client.pan }}
+            </span>
+        </p>
+
+    </div>
+
+    <span
+        class="
+            status-badge
+            status-{{ tax_case.status|lower }}
+        "
+    >
+        {{ tax_case.status }}
+    </span>
+
+</div>
+
+
+<div class="section-heading">
+
+    <div>
+        <h3>
+            Groww Reports
+        </h3>
+
+        <p>
+            Upload each Groww report separately.
+        </p>
+    </div>
+
+</div>
+
+
+<div class="report-grid">
+
+{% for report_type in groww_report_types %}
+
+    {% set uploaded_report =
+        report_map.get(report_type.key)
+    %}
+
+
+    <div class="report-card">
+
+        <div class="report-card-top">
+
+            <div class="report-icon">
+                XLS
+            </div>
+
+            {% if uploaded_report %}
+
+                <span class="report-status uploaded">
+                    {{ uploaded_report.processing_status }}
+                </span>
+
+            {% else %}
+
+                <span class="report-status missing">
+                    Not Uploaded
+                </span>
+
+            {% endif %}
+
+        </div>
+
+
+        <h3>
+            {{ report_type.name }}
+        </h3>
+
+        <p>
+            {{ report_type.description }}
+        </p>
+
+
+        {% if uploaded_report %}
+
+            <div class="report-file">
+
+                <span>
+                    {{ uploaded_report.original_filename }}
+                </span>
+
+            </div>
+
+            <button
+                class="button button-secondary full-width"
+                type="button"
+                disabled
+            >
+                View Report
+            </button>
+
+        {% else %}
+
+            <a
+                href="#"
+                class="button button-primary full-width"
+            >
+                Upload {{ report_type.name }}
+            </a>
+
+        {% endif %}
+
+    </div>
+
+{% endfor %}
+
+</div>
+
+
+<div class="panel coming-soon-panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h3>
+                Final ITR Summary
+            </h3>
+
+            <p>
+                Values will appear after Groww
+                reports are processed.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="summary-grid">
+
+        <div class="summary-item">
+            <span>
+                Intraday Turnover
+            </span>
+            <strong>
+                —
+            </strong>
+        </div>
+
+
+        <div class="summary-item">
+            <span>
+                Intraday Net P&amp;L
+            </span>
+            <strong>
+                —
+            </strong>
+        </div>
+
+
+        <div class="summary-item">
+            <span>
+                Non-Speculative Turnover
+            </span>
+            <strong>
+                —
+            </strong>
+        </div>
+
+
+        <div class="summary-item">
+            <span>
+                Non-Speculative Net P&amp;L
+            </span>
+            <strong>
+                —
+            </strong>
+        </div>
+
+
+        <div class="summary-item">
+            <span>
+                Sale Consideration
+            </span>
+            <strong>
+                —
+            </strong>
+        </div>
+
+
+        <div class="summary-item">
+            <span>
+                Long-Term Capital Gain
+            </span>
+            <strong>
+                —
+            </strong>
+        </div>
+
+
+        <div class="summary-item">
+            <span>
+                Short-Term Capital Gain
+            </span>
+            <strong>
+                —
+            </strong>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

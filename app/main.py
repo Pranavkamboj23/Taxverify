@@ -3,6 +3,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.config import settings
+from app.routes.cases import router as cases_router
 from app.routes.clients import router as clients_router
 from app.routes.dashboard import router as dashboard_router
 
@@ -28,6 +29,10 @@ app.include_router(
 
 app.include_router(
     clients_router
+)
+
+app.include_router(
+    cases_router
 )
 
 

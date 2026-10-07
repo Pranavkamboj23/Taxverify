@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<div class="breadcrumb">
+    <a href="/clients">
+        Clients
+    </a>
+
+    <span>/</span>
+
+    <span>
+        {{ client.name }}
+    </span>
+</div>
+
+
+<div class="page-heading">
+
+    <div>
+
+        <h2>
+            {{ client.name }}
+        </h2>
+
+        <p class="mono">
+            PAN: {{ client.pan }}
+        </p>
+
+    </div>
+
+    <a
+        href="/clients/{{ client.id }}/cases/new"
+        class="button button-primary"
+    >
+        + Create Tax Case
+    </a>
+
+</div>
+
+
+<div class="panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h3>
+                Financial Year Cases
+            </h3>
+
+            <p>
+                One TaxVerify case per client
+                and financial year.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% if tax_cases %}
+
+    <div class="case-list">
+
+        {% for tax_case in tax_cases %}
+
+        <a
+            href="/cases/{{ tax_case.id }}"
+            class="case-row"
+        >
+
+            <div>
+
+                <div class="case-title">
+                    FY {{ tax_case.financial_year }}
+                </div>
+
+                <div class="case-meta">
+                    Created
+                    {{ tax_case.created_at.strftime("%d %b %Y") }}
+                </div>
+
+            </div>
+
+
+            <div class="case-row-right">
+
+                <span
+                    class="
+                        status-badge
+                        status-{{ tax_case.status|lower }}
+                    "
+                >
+                    {{ tax_case.status }}
+                </span>
+
+                <span class="case-arrow">
+                    →
+                </span>
+
+            </div>
+
+        </a>
+
+        {% endfor %}
+
+    </div>
+
+
+    {% else %}
+
+    <div class="empty-state">
+
+        <h3>
+            No tax cases yet
+        </h3>
+
+        <p>
+            Create a financial-year case
+            before uploading Groww reports.
+        </p>
+
+        <a
+            href="/clients/{{ client.id }}/cases/new"
+            class="button button-primary"
+        >
+            Create First Tax Case
+        </a>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

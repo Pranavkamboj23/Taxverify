@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<div class="breadcrumb">
+
+    <a href="/clients">
+        Clients
+    </a>
+
+    <span>/</span>
+
+    <a href="/clients/{{ client.id }}">
+        {{ client.name }}
+    </a>
+
+    <span>/</span>
+
+    <span>
+        New Tax Case
+    </span>
+
+</div>
+
+
+<div class="page-heading">
+
+    <div>
+
+        <h2>
+            Create Tax Case
+        </h2>
+
+        <p>
+            {{ client.name }}
+            ·
+            <span class="mono">
+                {{ client.pan }}
+            </span>
+        </p>
+
+    </div>
+
+</div>
+
+
+<div class="form-card">
+
+    {% if error %}
+
+    <div class="alert alert-error">
+        {{ error }}
+    </div>
+
+    {% endif %}
+
+
+    <form method="post">
+
+        <div class="form-group">
+
+            <label for="financial_year">
+                Financial Year
+            </label>
+
+            <input
+                id="financial_year"
+                name="financial_year"
+                type="text"
+                placeholder="2025-26"
+                value="{{ financial_year }}"
+                maxlength="7"
+                required
+            >
+
+            <div class="form-help">
+                Enter the financial year in
+                YYYY-YY format.
+            </div>
+
+        </div>
+
+
+        <div class="form-actions">
+
+            <a
+                href="/clients/{{ client.id }}"
+                class="button button-secondary"
+            >
+                Cancel
+            </a>
+
+            <button
+                class="button button-primary"
+                type="submit"
+            >
+                Create Tax Case
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

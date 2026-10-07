@@ -111,7 +111,12 @@
 
                     <tr>
                         <td>
-                            {{ client.name }}
+                            <a
+                                href="/clients/{{ client.id }}"
+                                class="client-link"
+                            >
+                                {{ client.name }}
+                            </a>
                         </td>
 
                         <td class="mono">

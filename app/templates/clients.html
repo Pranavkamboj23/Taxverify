@@ -51,9 +51,14 @@
                     </td>
 
                     <td>
-                        <strong>
-                            {{ client.name }}
-                        </strong>
+                        <a
+                            href="/clients/{{ client.id }}"
+                            class="client-link"
+                        >
+                            <strong>
+                                {{ client.name }}
+                            </strong>
+                        </a>
                     </td>
 
                     <td class="mono">
