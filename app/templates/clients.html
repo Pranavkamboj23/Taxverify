@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<div class="page-heading">
+
+    <div>
+        <h2>Clients</h2>
+
+        <p>
+            Clients are identified using their PAN.
+        </p>
+    </div>
+
+    <a
+        href="/clients/new"
+        class="button button-primary"
+    >
+        + Add Client
+    </a>
+
+</div>
+
+
+<div class="panel">
+
+{% if clients %}
+
+    <div class="table-wrapper">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Client Name</th>
+                    <th>PAN</th>
+                    <th>Created</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            {% for client in clients %}
+
+                <tr>
+
+                    <td>
+                        #{{ client.id }}
+                    </td>
+
+                    <td>
+                        <strong>
+                            {{ client.name }}
+                        </strong>
+                    </td>
+
+                    <td class="mono">
+                        {{ client.pan }}
+                    </td>
+
+                    <td>
+                        {{ client.created_at.strftime("%d %b %Y") }}
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+{% else %}
+
+    <div class="empty-state">
+
+        <h3>No clients found</h3>
+
+        <p>
+            Add your first TaxVerify client.
+        </p>
+
+        <a
+            href="/clients/new"
+            class="button button-primary"
+        >
+            Add Client
+        </a>
+
+    </div>
+
+{% endif %}
+
+</div>
+
+{% endblock %}

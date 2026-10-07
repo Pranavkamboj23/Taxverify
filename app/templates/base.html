@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% if title %}
+            {{ title }} · TaxVerify
+        {% else %}
+            TaxVerify
+        {% endif %}
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="/static/styles.css"
+    >
+</head>
+
+<body>
+
+<div class="app-shell">
+
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-mark">
+                TV
+            </div>
+
+            <div>
+                <div class="brand-name">
+                    TaxVerify
+                </div>
+
+                <div class="brand-subtitle">
+                    CA Workspace
+                </div>
+            </div>
+        </div>
+
+        <nav class="navigation">
+
+            <a href="/dashboard">
+                Dashboard
+            </a>
+
+            <a href="/clients">
+                Clients
+            </a>
+
+            <a href="#">
+                Tax Cases
+            </a>
+
+            <a href="#">
+                Reports
+            </a>
+
+            <a href="#">
+                Review
+            </a>
+
+        </nav>
+
+        <div class="sidebar-footer">
+            TaxVerify v0.1
+        </div>
+
+    </aside>
+
+
+    <main class="main-content">
+
+        <header class="topbar">
+
+            <div>
+                <h1>
+                    {{ title }}
+                </h1>
+            </div>
+
+            <div class="topbar-badge">
+                Groww Engine
+            </div>
+
+        </header>
+
+
+        <section class="content">
+
+            {% block content %}
+            {% endblock %}
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>

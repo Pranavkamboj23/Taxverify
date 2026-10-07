@@ -1,13 +1,10 @@
 from fastapi import FastAPI
-from fastapi.responses import JSONResponse
+from fastapi.responses import RedirectResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.config import settings
-from app.database import Base, engine
-
-import app.models
-
-
-Base.metadata.create_all(bind=engine)
+from app.routes.clients import router as clients_router
+from app.routes.dashboard import router as dashboard_router
 
 
 app = FastAPI(
@@ -18,24 +15,36 @@ app = FastAPI(
 )
 
 
+app.mount(
+    "/static",
+    StaticFiles(directory="app/static"),
+    name="static",
+)
+
+
+app.include_router(
+    dashboard_router
+)
+
+app.include_router(
+    clients_router
+)
+
+
 @app.get("/")
 async def root():
-    return {
-        "application": settings.app_name,
-        "version": "0.1.0",
-        "status": "running",
-        "supported_brokers": [
-            "GROWW",
-        ],
-    }
+    return RedirectResponse(
+        url="/dashboard"
+    )
 
 
 @app.get("/health")
 async def health():
-    return JSONResponse(
-        content={
-            "status": "ok",
-            "service": settings.app_name,
-            "database": "connected",
-        }
-    )
+    return {
+        "status": "ok",
+        "service": settings.app_name,
+        "version": "0.1.0",
+        "supported_brokers": [
+            "GROWW",
+        ],
+    }

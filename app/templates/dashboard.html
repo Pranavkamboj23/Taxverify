@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<div class="page-heading">
+
+    <div>
+        <h2>Tax workspace</h2>
+
+        <p>
+            Manage clients, financial years and
+            broker tax reports.
+        </p>
+    </div>
+
+    <a
+        class="button button-primary"
+        href="/clients/new"
+    >
+        + Add Client
+    </a>
+
+</div>
+
+
+<div class="stat-grid">
+
+    <div class="stat-card">
+        <div class="stat-label">
+            Clients
+        </div>
+
+        <div class="stat-value">
+            {{ client_count }}
+        </div>
+    </div>
+
+
+    <div class="stat-card">
+        <div class="stat-label">
+            Tax Cases
+        </div>
+
+        <div class="stat-value">
+            {{ case_count }}
+        </div>
+    </div>
+
+
+    <div class="stat-card">
+        <div class="stat-label">
+            Reports
+        </div>
+
+        <div class="stat-value">
+            {{ report_count }}
+        </div>
+    </div>
+
+
+    <div class="stat-card">
+        <div class="stat-label">
+            Supported Broker
+        </div>
+
+        <div class="stat-value stat-text">
+            Groww
+        </div>
+    </div>
+
+</div>
+
+
+<div class="panel">
+
+    <div class="panel-header">
+
+        <div>
+            <h3>Recent Clients</h3>
+
+            <p>
+                Recently added TaxVerify clients.
+            </p>
+        </div>
+
+        <a href="/clients">
+            View all
+        </a>
+
+    </div>
+
+
+    {% if recent_clients %}
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Client</th>
+                        <th>PAN</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                {% for client in recent_clients %}
+
+                    <tr>
+                        <td>
+                            {{ client.name }}
+                        </td>
+
+                        <td class="mono">
+                            {{ client.pan }}
+                        </td>
+
+                        <td>
+                            {{ client.created_at.strftime("%d %b %Y") }}
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <h3>No clients yet</h3>
+
+            <p>
+                Create your first client to begin
+                a TaxVerify case.
+            </p>
+
+            <a
+                href="/clients/new"
+                class="button button-primary"
+            >
+                Add First Client
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

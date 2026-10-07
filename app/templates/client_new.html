@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<div class="page-heading">
+
+    <div>
+
+        <h2>Add Client</h2>
+
+        <p>
+            Create the taxpayer profile before
+            adding financial-year reports.
+        </p>
+
+    </div>
+
+</div>
+
+
+<div class="form-card">
+
+    {% if error %}
+
+        <div class="alert alert-error">
+            {{ error }}
+        </div>
+
+    {% endif %}
+
+
+    <form
+        method="post"
+        action="/clients/new"
+    >
+
+        <div class="form-group">
+
+            <label for="name">
+                Client Name
+            </label>
+
+            <input
+                id="name"
+                name="name"
+                type="text"
+                value="{{ name }}"
+                placeholder="Rahul Sharma"
+                autocomplete="off"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="pan">
+                PAN
+            </label>
+
+            <input
+                id="pan"
+                name="pan"
+                type="text"
+                value="{{ pan }}"
+                maxlength="10"
+                placeholder="ABCDE1234F"
+                autocomplete="off"
+                required
+            >
+
+            <div class="form-help">
+                PAN will automatically be converted
+                to uppercase.
+            </div>
+
+        </div>
+
+
+        <div class="form-actions">
+
+            <a
+                href="/clients"
+                class="button button-secondary"
+            >
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="button button-primary"
+            >
+                Create Client
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}
