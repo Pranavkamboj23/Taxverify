@@ -1042,3 +1042,10 @@ tbody tr:last-child td {
 .summary-waiting {
     color: #a4abb6;
 }
+
+.report-bottom-actions {
+    margin-top: 24px;
+
+    display: flex;
+    justify-content: flex-start;
+}

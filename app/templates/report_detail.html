@@ -30,6 +30,11 @@
 </div>
 
 
+
+<!-- =====================================================
+     PAGE HEADING
+===================================================== -->
+
 <div class="page-heading">
 
     <div>
@@ -44,6 +49,7 @@
 
     </div>
 
+
     <span
         class="
             status-badge
@@ -55,6 +61,13 @@
 
 </div>
 
+
+
+<!-- =====================================================
+     F&O / COMMODITY METRICS
+===================================================== -->
+
+{% if report.report_type in ["FNO", "COMMODITY"] %}
 
 <div class="stat-grid">
 
@@ -120,11 +133,161 @@
 </div>
 
 
+
+<!-- =====================================================
+     SHARES METRICS
+===================================================== -->
+
+{% elif report.report_type == "SHARES" %}
+
+<div class="stat-grid">
+
+    <div class="stat-card">
+
+        <div class="stat-label">
+            Intraday Turnover
+        </div>
+
+        <div class="stat-value money-value">
+            ₹ {{ "{:,.2f}".format(
+                metrics["INTRADAY_TURNOVER"].value
+            ) }}
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <div class="stat-label">
+            Intraday Net P&amp;L
+        </div>
+
+        <div class="stat-value money-value">
+            ₹ {{ "{:,.2f}".format(
+                metrics["INTRADAY_NET_PNL"].value
+            ) }}
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <div class="stat-label">
+            Sale Consideration
+        </div>
+
+        <div class="stat-value money-value">
+            ₹ {{ "{:,.2f}".format(
+                metrics["SALE_CONSIDERATION"].value
+            ) }}
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <div class="stat-label">
+            STCG
+        </div>
+
+        <div class="stat-value money-value">
+            ₹ {{ "{:,.2f}".format(
+                metrics["STCG"].value
+            ) }}
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <div class="stat-label">
+            LTCG
+        </div>
+
+        <div class="stat-value money-value">
+            ₹ {{ "{:,.2f}".format(
+                metrics["LTCG"].value
+            ) }}
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     MUTUAL FUNDS METRICS
+===================================================== -->
+
+{% elif report.report_type == "MUTUAL_FUNDS" %}
+
+<div class="stat-grid">
+
+    <div class="stat-card">
+
+        <div class="stat-label">
+            Sale Consideration
+        </div>
+
+        <div class="stat-value money-value">
+            ₹ {{ "{:,.2f}".format(
+                metrics["SALE_CONSIDERATION"].value
+            ) }}
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <div class="stat-label">
+            STCG
+        </div>
+
+        <div class="stat-value money-value">
+            ₹ {{ "{:,.2f}".format(
+                metrics["STCG"].value
+            ) }}
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <div class="stat-label">
+            LTCG
+        </div>
+
+        <div class="stat-value money-value">
+            ₹ {{ "{:,.2f}".format(
+                metrics["LTCG"].value
+            ) }}
+        </div>
+
+    </div>
+
+</div>
+
+{% endif %}
+
+
+
+<!-- =====================================================
+     REPORT INFORMATION
+===================================================== -->
+
 <div class="panel report-info-panel">
 
     <div class="panel-header">
 
         <div>
+
             <h3>
                 Report Information
             </h3>
@@ -133,6 +296,7 @@
                 Broker metadata extracted from
                 the workbook.
             </p>
+
         </div>
 
     </div>
@@ -141,45 +305,82 @@
     <div class="detail-grid">
 
         <div>
-            <span>Broker</span>
-            <strong>Groww</strong>
+
+            <span>
+                Broker
+            </span>
+
+            <strong>
+                Groww
+            </strong>
+
         </div>
 
+
         <div>
-            <span>Report Type</span>
+
+            <span>
+                Report Type
+            </span>
+
             <strong>
                 {{ report.report_type }}
             </strong>
+
         </div>
 
+
         <div>
-            <span>Groww Client</span>
+
+            <span>
+                Groww Client
+            </span>
+
             <strong>
                 {{ report.broker_client_name }}
             </strong>
+
         </div>
 
+
         <div>
-            <span>Groww Client Code</span>
+
+            <span>
+                Groww Client Code
+            </span>
+
             <strong class="mono">
                 {{ report.broker_client_code }}
             </strong>
+
         </div>
 
+
         <div>
-            <span>Period</span>
+
+            <span>
+                Period
+            </span>
+
             <strong>
                 {{ report.period_start }}
                 →
                 {{ report.period_end }}
             </strong>
+
         </div>
 
+
         <div>
-            <span>Format</span>
+
+            <span>
+                Format
+            </span>
+
             <strong>
                 {{ report.format_version }}
             </strong>
+
         </div>
 
     </div>
@@ -187,11 +388,17 @@
 </div>
 
 
+
+<!-- =====================================================
+     RECONCILIATION
+===================================================== -->
+
 <div class="panel report-info-panel">
 
     <div class="panel-header">
 
         <div>
+
             <h3>
                 Reconciliation
             </h3>
@@ -200,10 +407,13 @@
                 Independent checks performed
                 by TaxVerify.
             </p>
+
         </div>
 
     </div>
 
+
+    {% if reconciliations %}
 
     <div class="table-wrapper">
 
@@ -212,11 +422,27 @@
             <thead>
 
                 <tr>
-                    <th>Check</th>
-                    <th>Reported</th>
-                    <th>Calculated</th>
-                    <th>Difference</th>
-                    <th>Status</th>
+
+                    <th>
+                        Check
+                    </th>
+
+                    <th>
+                        Reported
+                    </th>
+
+                    <th>
+                        Calculated
+                    </th>
+
+                    <th>
+                        Difference
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
                 </tr>
 
             </thead>
@@ -232,31 +458,49 @@
                         {{ item.check_name }}
                     </td>
 
+
                     <td>
+
                         {% if item.reported_value is not none %}
+
                             ₹ {{ "{:,.2f}".format(
                                 item.reported_value
                             ) }}
+
                         {% else %}
+
                             —
+
                         {% endif %}
+
                     </td>
 
+
                     <td>
+
                         ₹ {{ "{:,.2f}".format(
                             item.calculated_value
                         ) }}
+
                     </td>
 
+
                     <td>
+
                         {% if item.difference is not none %}
+
                             ₹ {{ "{:,.2f}".format(
                                 item.difference
                             ) }}
+
                         {% else %}
+
                             —
+
                         {% endif %}
+
                     </td>
+
 
                     <td>
 
@@ -281,22 +525,47 @@
 
     </div>
 
+
+    {% else %}
+
+    <div class="empty-state">
+
+        <h3>
+            No reconciliation checks
+        </h3>
+
+        <p>
+            No independent reconciliation
+            was available for this report.
+        </p>
+
+    </div>
+
+    {% endif %}
+
 </div>
 
+
+
+<!-- =====================================================
+     CALCULATION AUDIT
+===================================================== -->
 
 <div class="panel report-info-panel">
 
     <div class="panel-header">
 
         <div>
+
             <h3>
                 Calculation Audit
             </h3>
 
             <p>
-                How TaxVerify obtained the
-                final figures.
+                TaxVerify calculation logic
+                applied to this report.
             </p>
+
         </div>
 
     </div>
@@ -304,34 +573,172 @@
 
     <div class="audit-formula">
 
-        <div>
-            Groww Rule
-        </div>
 
-        <strong>
-            Final Net P&amp;L
-            =
-            Realised P&amp;L
-            -
-            Charges
-        </strong>
+        <!-- F&O / COMMODITY -->
 
-        <p>
-            {{ "{:,.2f}".format(
-                metrics["REALISED_PNL"].value
-            ) }}
-            -
-            {{ "{:,.2f}".format(
-                metrics["CHARGES"].value
-            ) }}
-            =
-            {{ "{:,.2f}".format(
-                metrics["FINAL_NET_PNL"].value
-            ) }}
-        </p>
+        {% if report.report_type in ["FNO", "COMMODITY"] %}
+
+            <div>
+                Groww Business P&amp;L Rule
+            </div>
+
+
+            <strong>
+                Final Net P&amp;L
+                =
+                Realised P&amp;L
+                -
+                Charges
+            </strong>
+
+
+            <p>
+
+                {{ "{:,.2f}".format(
+                    metrics["REALISED_PNL"].value
+                ) }}
+
+                -
+
+                {{ "{:,.2f}".format(
+                    metrics["CHARGES"].value
+                ) }}
+
+                =
+
+                {{ "{:,.2f}".format(
+                    metrics["FINAL_NET_PNL"].value
+                ) }}
+
+            </p>
+
+
+
+        <!-- SHARES -->
+
+        {% elif report.report_type == "SHARES" %}
+
+            <div>
+                Groww Shares Rule
+            </div>
+
+
+            <strong>
+                Intraday business and capital gains
+                remain separately classified.
+            </strong>
+
+
+            <p>
+                Intraday Turnover:
+                {{ "{:,.2f}".format(
+                    metrics["INTRADAY_TURNOVER"].value
+                ) }}
+            </p>
+
+
+            <p>
+                Intraday Net P&amp;L:
+                {{ "{:,.2f}".format(
+                    metrics["INTRADAY_NET_PNL"].value
+                ) }}
+            </p>
+
+
+            <p>
+                Sale Consideration:
+                {{ "{:,.2f}".format(
+                    metrics["SALE_CONSIDERATION"].value
+                ) }}
+            </p>
+
+
+            <p>
+                STCG:
+                {{ "{:,.2f}".format(
+                    metrics["STCG"].value
+                ) }}
+            </p>
+
+
+            <p>
+                LTCG:
+                {{ "{:,.2f}".format(
+                    metrics["LTCG"].value
+                ) }}
+            </p>
+
+
+
+        <!-- MUTUAL FUNDS -->
+
+        {% elif report.report_type == "MUTUAL_FUNDS" %}
+
+            <div>
+                Groww Mutual Fund Rule
+            </div>
+
+
+            <strong>
+                Sale Consideration
+                =
+                Σ(
+                    Redeem Price ×
+                    Matched Quantity
+                )
+            </strong>
+
+
+            <p>
+                Calculated transaction by transaction.
+            </p>
+
+
+            <p>
+                Sale Consideration:
+                {{ "{:,.2f}".format(
+                    metrics["SALE_CONSIDERATION"].value
+                ) }}
+            </p>
+
+
+            <p>
+                STCG:
+                {{ "{:,.2f}".format(
+                    metrics["STCG"].value
+                ) }}
+            </p>
+
+
+            <p>
+                LTCG:
+                {{ "{:,.2f}".format(
+                    metrics["LTCG"].value
+                ) }}
+            </p>
+
+        {% endif %}
 
     </div>
 
 </div>
+
+
+
+<!-- =====================================================
+     BACK BUTTON
+===================================================== -->
+
+<div class="report-bottom-actions">
+
+    <a
+        href="/cases/{{ tax_case.id }}"
+        class="button button-secondary"
+    >
+        ← Back to Tax Case
+    </a>
+
+</div>
+
 
 {% endblock %}

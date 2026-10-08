@@ -17,10 +17,9 @@ from sqlalchemy.orm import Session
 
 from app.brokers.groww.parser import (
     GrowwParseError,
-    parse_groww_report,
 )
-from app.brokers.groww.rules import (
-    calculate_groww,
+from app.brokers.groww.processor import (
+    process_groww_report,
 )
 from app.brokers.groww.validator import (
     validate_financial_year,
@@ -52,30 +51,38 @@ templates = Jinja2Templates(
 SUPPORTED_REPORT_TYPES = {
     "FNO": "F&O",
     "COMMODITY": "Commodity",
+    "SHARES": "Shares",
+    "MUTUAL_FUNDS": "Mutual Funds",
 }
 
 
-def add_metric(
-    db: Session,
-    report: BrokerReport,
-    key: str,
-    value,
-    source_sheet=None,
-    source_cell=None,
-    source_label=None,
-    derivation=None,
+def upload_error_response(
+    request,
+    tax_case,
+    report_type,
+    message,
+    status_code=400,
 ):
-    metric = ReportMetric(
-        report_id=report.id,
-        metric_key=key,
-        value=value,
-        source_sheet=source_sheet,
-        source_cell=source_cell,
-        source_label=source_label,
-        derivation=derivation,
+    return templates.TemplateResponse(
+        request=request,
+        name="report_upload.html",
+        context={
+            "title": (
+                f"Upload "
+                f"{SUPPORTED_REPORT_TYPES[report_type]}"
+            ),
+            "tax_case": tax_case,
+            "client": tax_case.client,
+            "report_type": report_type,
+            "report_name": (
+                SUPPORTED_REPORT_TYPES[
+                    report_type
+                ]
+            ),
+            "error": message,
+        },
+        status_code=status_code,
     )
-
-    db.add(metric)
 
 
 @router.get(
@@ -93,12 +100,14 @@ async def upload_report_page(
     if report_type not in SUPPORTED_REPORT_TYPES:
         raise HTTPException(
             status_code=404,
-            detail="Report type not supported yet.",
+            detail="Unsupported Groww report type.",
         )
 
     tax_case = (
         db.query(TaxCase)
-        .filter(TaxCase.id == case_id)
+        .filter(
+            TaxCase.id == case_id
+        )
         .first()
     )
 
@@ -145,12 +154,14 @@ async def upload_report(
     if report_type not in SUPPORTED_REPORT_TYPES:
         raise HTTPException(
             status_code=404,
-            detail="Report type not supported.",
+            detail="Unsupported Groww report type.",
         )
 
     tax_case = (
         db.query(TaxCase)
-        .filter(TaxCase.id == case_id)
+        .filter(
+            TaxCase.id == case_id
+        )
         .first()
     )
 
@@ -160,40 +171,18 @@ async def upload_report(
             detail="Tax case not found.",
         )
 
-    def upload_error(
-        message: str,
-        status_code: int = 400,
-    ):
-        return templates.TemplateResponse(
-            request=request,
-            name="report_upload.html",
-            context={
-                "title": (
-                    f"Upload "
-                    f"{SUPPORTED_REPORT_TYPES[report_type]}"
-                ),
-                "tax_case": tax_case,
-                "client": tax_case.client,
-                "report_type": report_type,
-                "report_name": (
-                    SUPPORTED_REPORT_TYPES[
-                        report_type
-                    ]
-                ),
-                "error": message,
-            },
-            status_code=status_code,
-        )
-
-    existing_type = (
+    existing_report = (
         db.query(BrokerReport)
         .filter(
             BrokerReport.tax_case_id
             == tax_case.id,
+
             BrokerReport.broker
             == "GROWW",
+
             BrokerReport.report_type
             == report_type,
+
             BrokerReport.processing_status.in_(
                 [
                     "PROCESSED",
@@ -204,10 +193,16 @@ async def upload_report(
         .first()
     )
 
-    if existing_type:
-        return upload_error(
-            "A processed Groww report of this "
-            "type already exists for this case.",
+    if existing_report:
+        return upload_error_response(
+            request,
+            tax_case,
+            report_type,
+            (
+                "A processed Groww report "
+                "of this type already exists "
+                "for this tax case."
+            ),
             409,
         )
 
@@ -225,8 +220,11 @@ async def upload_report(
         )
 
     except FileValidationError as exc:
-        return upload_error(
-            str(exc)
+        return upload_error_response(
+            request,
+            tax_case,
+            report_type,
+            str(exc),
         )
 
     file_hash = calculate_sha256(
@@ -238,6 +236,7 @@ async def upload_report(
         .filter(
             BrokerReport.tax_case_id
             == tax_case.id,
+
             BrokerReport.file_hash
             == file_hash,
         )
@@ -245,9 +244,14 @@ async def upload_report(
     )
 
     if duplicate:
-        return upload_error(
-            "This exact file has already "
-            "been uploaded to this tax case.",
+        return upload_error_response(
+            request,
+            tax_case,
+            report_type,
+            (
+                "This exact file has already "
+                "been uploaded to this tax case."
+            ),
             409,
         )
 
@@ -273,10 +277,18 @@ async def upload_report(
     db.commit()
     db.refresh(report)
 
+    tolerance = Decimal(
+        str(
+            settings
+            .reconciliation_tolerance
+        )
+    )
+
     try:
-        parsed = parse_groww_report(
-            stored_path,
-            report_type,
+        processed = process_groww_report(
+            filepath=stored_path,
+            report_type=report_type,
+            tolerance=tolerance,
         )
 
     except GrowwParseError as exc:
@@ -291,29 +303,39 @@ async def upload_report(
 
         db.commit()
 
-        return upload_error(
-            f"Groww validation failed: {exc}"
+        return upload_error_response(
+            request,
+            tax_case,
+            report_type,
+            (
+                f"Groww validation failed: "
+                f"{exc}"
+            ),
         )
 
     report.broker_client_name = (
-        parsed.client_name
+        processed.client_name
     )
 
     report.broker_client_code = (
-        parsed.client_code
+        processed.client_code
     )
 
     report.period_start = (
-        parsed.period_start
+        processed.period_start
     )
 
     report.period_end = (
-        parsed.period_end
+        processed.period_end
     )
+
+    # --------------------------------------------
+    # Financial year validation
+    # --------------------------------------------
 
     fy_validation = (
         validate_financial_year(
-            parsed,
+            processed,
             tax_case.financial_year,
         )
     )
@@ -330,21 +352,32 @@ async def upload_report(
 
         db.commit()
 
-        return upload_error(
-            fy_validation.message
+        return upload_error_response(
+            request,
+            tax_case,
+            report_type,
+            fy_validation.message,
         )
 
-    existing_groww_account = (
+    # --------------------------------------------
+    # Groww account consistency
+    # --------------------------------------------
+
+    existing_groww_report = (
         db.query(BrokerReport)
         .filter(
             BrokerReport.tax_case_id
             == tax_case.id,
+
             BrokerReport.broker
             == "GROWW",
+
             BrokerReport.id
             != report.id,
+
             BrokerReport.broker_client_code
             .isnot(None),
+
             BrokerReport.processing_status.in_(
                 [
                     "PROCESSED",
@@ -356,11 +389,11 @@ async def upload_report(
     )
 
     if (
-        existing_groww_account
+        existing_groww_report
         and
-        existing_groww_account
+        existing_groww_report
         .broker_client_code
-        != parsed.client_code
+        != processed.client_code
     ):
 
         report.processing_status = (
@@ -369,200 +402,96 @@ async def upload_report(
 
         report.validation_message = (
             "Groww client code does not "
-            "match the other Groww reports "
-            "in this tax case."
+            "match the existing Groww "
+            "reports in this tax case."
         )
 
         db.commit()
 
-        return upload_error(
+        return upload_error_response(
+            request,
+            tax_case,
+            report_type,
             report.validation_message,
             409,
         )
 
-    tolerance = Decimal(
-        str(
-            settings
-            .reconciliation_tolerance
-        )
-    )
+    # --------------------------------------------
+    # Save metrics
+    # --------------------------------------------
 
-    calculation = calculate_groww(
-        parsed,
-        tolerance,
-    )
+    for metric in processed.metrics:
 
-    add_metric(
-        db,
-        report,
-        "REALISED_PNL",
-        calculation.realised_pnl,
-        source_sheet=(
-            parsed.realised_pnl.sheet
-        ),
-        source_cell=(
-            parsed.realised_pnl.cell
-        ),
-        source_label=(
-            parsed.realised_pnl.label
-        ),
-    )
-
-    add_metric(
-        db,
-        report,
-        "CHARGES",
-        calculation.charges,
-        source_sheet=(
-            parsed.charges.sheet
-        ),
-        source_cell=(
-            parsed.charges.cell
-        ),
-        source_label=(
-            parsed.charges.label
-        ),
-    )
-
-    add_metric(
-        db,
-        report,
-        "FINAL_NET_PNL",
-        calculation.final_net_pnl,
-        derivation=(
-            "Groww rule: "
-            "Realised P&L - Charges"
-        ),
-    )
-
-    add_metric(
-        db,
-        report,
-        "TURNOVER",
-        calculation.turnover,
-        derivation=(
-            "Broker reported turnover "
-            "when available; otherwise "
-            "SUM(ABS(trade-level "
-            "Realized P&L))."
-        ),
-    )
-
-    add_metric(
-        db,
-        report,
-        "CALCULATED_TURNOVER",
-        calculation.turnover_calculated,
-        derivation=(
-            "SUM(ABS(trade-level "
-            "Realized P&L))"
-        ),
-    )
-
-    if (
-        calculation.turnover_reported
-        is not None
-    ):
-        add_metric(
-            db,
-            report,
-            "REPORTED_TURNOVER",
-            calculation.turnover_reported,
-            source_sheet=(
-                parsed
-                .reported_turnover
-                .sheet
-            ),
-            source_cell=(
-                parsed
-                .reported_turnover
-                .cell
-            ),
-            source_label=(
-                parsed
-                .reported_turnover
-                .label
-            ),
+        db.add(
+            ReportMetric(
+                report_id=report.id,
+                metric_key=metric.key,
+                value=metric.value,
+                source_sheet=(
+                    metric.source_sheet
+                ),
+                source_cell=(
+                    metric.source_cell
+                ),
+                source_label=(
+                    metric.source_label
+                ),
+                derivation=(
+                    metric.derivation
+                ),
+            )
         )
 
-    pnl_reconciliation = (
-        ReportReconciliation(
-            report_id=report.id,
-            check_name=(
-                "Summary P&L vs "
-                "Trade-Level P&L"
-            ),
-            reported_value=(
-                calculation.realised_pnl
-            ),
-            calculated_value=(
-                parsed.trade_level_pnl
-            ),
-            difference=(
-                calculation
-                .pnl_reconciliation_difference
-            ),
-            tolerance=tolerance,
-            status=(
-                calculation.pnl_status
-            ),
-            message=(
-                "Trade-level realised P&L "
-                "is compared against the "
-                "summary Realised P&L."
-            ),
+    # --------------------------------------------
+    # Save reconciliations
+    # --------------------------------------------
+
+    for check in processed.reconciliations:
+
+        db.add(
+            ReportReconciliation(
+                report_id=report.id,
+
+                check_name=(
+                    check.check_name
+                ),
+
+                reported_value=(
+                    check.reported_value
+                ),
+
+                calculated_value=(
+                    check.calculated_value
+                ),
+
+                difference=(
+                    check.difference
+                ),
+
+                tolerance=tolerance,
+
+                status=check.status,
+
+                message=check.message,
+            )
         )
-    )
 
-    db.add(
-        pnl_reconciliation
-    )
+    # --------------------------------------------
+    # Determine final report status
+    # --------------------------------------------
 
-    turnover_reconciliation = (
-        ReportReconciliation(
-            report_id=report.id,
-            check_name=(
-                "Reported vs "
-                "Calculated Turnover"
-            ),
-            reported_value=(
-                calculation
-                .turnover_reported
-            ),
-            calculated_value=(
-                calculation
-                .turnover_calculated
-            ),
-            difference=(
-                calculation
-                .turnover_reconciliation_difference
-            ),
-            tolerance=tolerance,
-            status=(
-                calculation.turnover_status
-            ),
-            message=(
-                "Turnover is checked using "
-                "trade-level absolute P&L."
-            ),
-        )
-    )
-
-    db.add(
-        turnover_reconciliation
-    )
-
-    mismatch_statuses = {
+    review_statuses = {
         "MISMATCH",
         "REVIEW_REQUIRED",
     }
 
-    if (
-        calculation.pnl_status
-        in mismatch_statuses
-        or calculation.turnover_status
-        in mismatch_statuses
-    ):
+    requires_review = any(
+        check.status in review_statuses
+        for check
+        in processed.reconciliations
+    )
+
+    if requires_review:
         report.processing_status = (
             "REVIEW_REQUIRED"
         )

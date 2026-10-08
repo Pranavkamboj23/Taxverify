@@ -42,6 +42,7 @@
 
     </div>
 
+
     <span
         class="
             status-badge
@@ -54,9 +55,14 @@
 </div>
 
 
+<!-- =====================================================
+     GROWW REPORTS
+===================================================== -->
+
 <div class="section-heading">
 
     <div>
+
         <h3>
             Groww Reports
         </h3>
@@ -64,6 +70,7 @@
         <p>
             Upload each Groww report separately.
         </p>
+
     </div>
 
 </div>
@@ -86,6 +93,7 @@
                 XLS
             </div>
 
+
             {% if uploaded_report %}
 
                 <span class="report-status uploaded">
@@ -107,6 +115,7 @@
             {{ report_type.name }}
         </h3>
 
+
         <p>
             {{ report_type.description }}
         </p>
@@ -114,43 +123,33 @@
 
         {% if uploaded_report %}
 
-    <div class="report-file">
-        <span>
-            {{ uploaded_report.original_filename }}
-        </span>
-    </div>
+            <div class="report-file">
 
-    <a
-        href="/reports/{{ uploaded_report.id }}"
-        class="button button-secondary full-width"
-    >
-        View Report
-    </a>
+                <span>
+                    {{ uploaded_report.original_filename }}
+                </span>
 
-{% else %}
+            </div>
 
-    {% if report_type.key in ["FNO", "COMMODITY"] %}
 
-        <a
-            href="/cases/{{ tax_case.id }}/reports/{{ report_type.key }}/upload"
-            class="button button-primary full-width"
-        >
-            Upload {{ report_type.name }}
-        </a>
+            <a
+                href="/reports/{{ uploaded_report.id }}"
+                class="button button-secondary full-width"
+            >
+                View Report
+            </a>
 
-    {% else %}
 
-        <button
-            class="button button-secondary full-width"
-            type="button"
-            disabled
-        >
-            Coming Soon
-        </button>
+        {% else %}
 
-    {% endif %}
+            <a
+                href="/cases/{{ tax_case.id }}/reports/{{ report_type.key }}/upload"
+                class="button button-primary full-width"
+            >
+                Upload {{ report_type.name }}
+            </a>
 
-{% endif %}
+        {% endif %}
 
     </div>
 
@@ -158,6 +157,11 @@
 
 </div>
 
+
+
+<!-- =====================================================
+     FINAL ITR SUMMARY
+===================================================== -->
 
 <div class="panel coming-soon-panel">
 
@@ -170,243 +174,285 @@
             </h3>
 
             <p>
-                Values will appear after Groww
-                reports are processed.
+                Aggregated figures from successfully
+                processed Groww reports.
             </p>
 
         </div>
 
     </div>
 
+
     <div class="summary-status-bar">
 
         <div>
+
             <strong>
                 {{ summary.processed_report_count }}
             </strong>
-    
+
             processed report(s)
+
         </div>
-    
+
+
         {% if summary.review_required_count > 0 %}
-    
+
             <div class="summary-review-warning">
-    
+
                 {{ summary.review_required_count }}
                 report(s) require review
-    
+
             </div>
-    
+
         {% endif %}
-    
+
     </div>
+
 
     <div class="summary-grid">
 
 
+        <!-- 1. INTRADAY TURNOVER -->
+
         <div class="summary-item">
-    
+
             <span>
                 1. Intraday Speculative Turnover
             </span>
-    
+
+
             {% if summary.intraday_turnover.value is not none %}
-    
+
                 <strong>
                     ₹ {{ "{:,.2f}".format(
                         summary.intraday_turnover.value
                     ) }}
                 </strong>
-    
+
             {% else %}
-    
+
                 <strong class="summary-waiting">
                     —
                 </strong>
-    
+
             {% endif %}
-    
+
+
             <small>
                 {{ summary.intraday_turnover.message }}
             </small>
-    
+
         </div>
-    
-    
+
+
+
+        <!-- 2. INTRADAY NET P&L -->
+
         <div class="summary-item">
-    
+
             <span>
                 2. Intraday Speculative Net P&amp;L
             </span>
-    
+
+
             {% if summary.intraday_net_pnl.value is not none %}
-    
+
                 <strong>
                     ₹ {{ "{:,.2f}".format(
                         summary.intraday_net_pnl.value
                     ) }}
                 </strong>
-    
+
             {% else %}
-    
+
                 <strong class="summary-waiting">
                     —
                 </strong>
-    
+
             {% endif %}
-    
+
+
             <small>
                 {{ summary.intraday_net_pnl.message }}
             </small>
-    
+
         </div>
-    
-    
+
+
+
+        <!-- 3. NON SPEC TURNOVER -->
+
         <div class="summary-item">
-    
+
             <span>
                 3. Non-Speculative Turnover
             </span>
-    
+
+
             {% if summary.non_spec_turnover.value is not none %}
-    
+
                 <strong>
                     ₹ {{ "{:,.2f}".format(
                         summary.non_spec_turnover.value
                     ) }}
                 </strong>
-    
+
             {% else %}
-    
+
                 <strong class="summary-waiting">
                     —
                 </strong>
-    
+
             {% endif %}
-    
+
+
             <small>
                 {{ summary.non_spec_turnover.message }}
             </small>
-    
+
         </div>
-    
-    
+
+
+
+        <!-- 4. NON SPEC NET P&L -->
+
         <div class="summary-item">
-    
+
             <span>
                 4. Non-Speculative Net P&amp;L
             </span>
-    
+
+
             {% if summary.non_spec_net_pnl.value is not none %}
-    
+
                 <strong>
                     ₹ {{ "{:,.2f}".format(
                         summary.non_spec_net_pnl.value
                     ) }}
                 </strong>
-    
+
             {% else %}
-    
+
                 <strong class="summary-waiting">
                     —
                 </strong>
-    
+
             {% endif %}
-    
+
+
             <small>
                 {{ summary.non_spec_net_pnl.message }}
             </small>
-    
+
         </div>
-    
-    
+
+
+
+        <!-- 5. SALE CONSIDERATION -->
+
         <div class="summary-item">
-    
+
             <span>
                 5. Total Sale Consideration
             </span>
-    
+
+
             {% if summary.sale_consideration.value is not none %}
-    
+
                 <strong>
                     ₹ {{ "{:,.2f}".format(
                         summary.sale_consideration.value
                     ) }}
                 </strong>
-    
+
             {% else %}
-    
+
                 <strong class="summary-waiting">
                     —
                 </strong>
-    
+
             {% endif %}
-    
+
+
             <small>
                 {{ summary.sale_consideration.message }}
             </small>
-    
+
         </div>
-    
-    
+
+
+
+        <!-- 6. LTCG -->
+
         <div class="summary-item">
-    
+
             <span>
                 6. Long-Term Capital Gain
             </span>
-    
+
+
             {% if summary.ltcg.value is not none %}
-    
+
                 <strong>
                     ₹ {{ "{:,.2f}".format(
                         summary.ltcg.value
                     ) }}
                 </strong>
-    
+
             {% else %}
-    
+
                 <strong class="summary-waiting">
                     —
                 </strong>
-    
+
             {% endif %}
-    
+
+
             <small>
                 {{ summary.ltcg.message }}
             </small>
-    
+
         </div>
-    
-    
+
+
+
+        <!-- 7. STCG -->
+
         <div class="summary-item">
-    
+
             <span>
                 7. Short-Term Capital Gain
             </span>
-    
+
+
             {% if summary.stcg.value is not none %}
-    
+
                 <strong>
                     ₹ {{ "{:,.2f}".format(
                         summary.stcg.value
                     ) }}
                 </strong>
-    
+
             {% else %}
-    
+
                 <strong class="summary-waiting">
                     —
                 </strong>
-    
+
             {% endif %}
-    
+
+
             <small>
                 {{ summary.stcg.message }}
             </small>
-    
+
         </div>
-    
-    
+
+
     </div>
+
+</div>
+
 
 {% endblock %}
